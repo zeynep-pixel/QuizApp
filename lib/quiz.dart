@@ -1,45 +1,75 @@
-// ignore_for_file: empty_constructor_bodies
-
 import 'package:flutter/material.dart';
-import 'package:quizz_app/maincontainer.dart';
-import 'package:quizz_app/questions_screen.dart';
+import 'package:quiz_app/data/questions.dart';
+import 'package:quiz_app/question_screen.dart';
+import 'package:quiz_app/result_screen.dart';
+import 'package:quiz_app/start_screen.dart';
+
+
+
 
 class Quiz extends StatefulWidget {
-  const Quiz({super.key});
+ const Quiz({super.key});
+ @override
+ State<Quiz> createState(){
+  return _QuizState();
+ }
 
-  @override
-  State<Quiz> createState() {
-    return _QuizState();
-  }
 }
 
-class _QuizState extends State<Quiz> {
-  var activeScreen = "maincontainer-screen";
+class _QuizState extends  State<Quiz>{
+  var activeScreen = 'active-screen';
+  List<String> selectedAnswer = [];
+  void switchScreen(){
+    setState(() { 
+      activeScreen = 'questions-screen';
+    });
+  }
 
-  void switchScreen() {
+  void chooseAnswers(String answer){
+    selectedAnswer.add(answer);
+    if(selectedAnswer.length == questions.length){
+      setState(() {
+        activeScreen = 'results-screen';
+      });
+    }
+  }
+
+  void restartQuiz() {
     setState(() {
-      activeScreen = "questions-screen";
+      selectedAnswer = [];
+      activeScreen = 'questions-screen';
     });
   }
 
   @override
-  Widget build(context) {
-    Widget screenWidget = MainContainer(switchScreen);
-
-    if (activeScreen == "questions-screen" ){
-        screenWidget = QuestionsScreen();
+  Widget build(context){
+    Widget screenWidget = StartScreen(switchScreen);
+    if(activeScreen=='questions-screen'){
+      screenWidget = QuestionScreen(onSelected: chooseAnswers,);
     }
-   
+    if(activeScreen=='results-screen'){
+      screenWidget = ResultScreen(chosenAnswers: selectedAnswer,onRestart: restartQuiz,);
+    }
+
+
+
     return MaterialApp(
-        home: Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [
-          Color.fromARGB(255, 78, 13, 151),
-          Color.fromARGB(255, 144, 85, 212)
-        ])),
-        child: screenWidget
+      home: Scaffold(
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+                colors: [Colors.deepOrange, Colors.deepPurple],
+                begin: Alignment.bottomLeft,
+                end: Alignment.topRight),
+          ),
+          child: screenWidget,
+          ),
       ),
-    ));
+    );
   }
 }
+
+
+
+
+
